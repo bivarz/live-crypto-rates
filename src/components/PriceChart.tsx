@@ -30,8 +30,8 @@ export function PriceChart({ pair, displayName }: PriceChartProps) {
         timestamp: price.timestamp,
       };
 
-      // Update ref to avoid stale closure
-      dataRef.current = [...dataRef.current, newDataPoint];
+      // Efficiently update array without full copy
+      dataRef.current.push(newDataPoint);
       
       // Keep only last MAX_DATA_POINTS
       if (dataRef.current.length > MAX_DATA_POINTS) {

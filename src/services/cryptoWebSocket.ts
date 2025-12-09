@@ -144,7 +144,6 @@ export class CryptoWebSocketService {
     this.listeners.get(pair)!.add(callback);
 
     // Add to subscribed pairs
-    const wasEmpty = this.subscribedPairs.size === 0;
     this.subscribedPairs.add(pair);
 
     // If using mock data, subscribe to mock service
@@ -158,9 +157,8 @@ export class CryptoWebSocketService {
         });
         this.mockUnsubscribers.set(pair, unsubscribe);
       }
-    } else if (wasEmpty || this.ws?.readyState !== WebSocket.OPEN) {
-      // Try to connect to real WebSocket
-      this.disconnect();
+    } else if (this.ws?.readyState !== WebSocket.OPEN && !this.isConnecting) {
+      // Try to connect to real WebSocket only if not already connecting
       this.connect();
     }
 

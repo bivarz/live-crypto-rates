@@ -7,19 +7,18 @@ export function useCryptoPrice(pair: TradingPair) {
   const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
-    const updateConnectionStatus = () => {
-      setIsConnected(cryptoWebSocketService.isConnected());
-    };
-
-    updateConnectionStatus();
-    const intervalId = setInterval(updateConnectionStatus, 1000);
-
     const unsubscribe = cryptoWebSocketService.subscribe(pair, (data) => {
       setPrice(data);
+      // Update connection status when we receive data
+      setIsConnected(cryptoWebSocketService.isConnected());
     });
 
+    // Check connection status after subscription
+    setTimeout(() => {
+      setIsConnected(cryptoWebSocketService.isConnected());
+    }, 100);
+
     return () => {
-      clearInterval(intervalId);
       unsubscribe();
     };
   }, [pair]);
