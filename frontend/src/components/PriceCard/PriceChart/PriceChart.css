@@ -1,0 +1,28 @@
+.price-chart {
+  margin-top: 12px;
+  width: 100%;
+  height: 100px;
+  background: #f9fafb;
+  border-radius: 4px;
+  padding: 4px;
+}
+
+.chart-tooltip {
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+}
+
+.tooltip-label {
+  margin: 0 0 4px 0;
+  font-weight: 600;
+}
+
+.tooltip-time {
+  margin: 0;
+  font-size: 0.7rem;
+  opacity: 0.9;
+}
+

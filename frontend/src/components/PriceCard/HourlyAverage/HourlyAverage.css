@@ -1,0 +1,30 @@
+.hourly-average {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+  align-items: flex-end;
+  text-align: right;
+}
+
+.average-label {
+  font-size: 0.875rem;
+  color: #6b7280;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.average-value {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #0369a1;
+  font-family: 'Courier New', monospace;
+}
+
+.average-count {
+  font-size: 0.75rem;
+  color: #9ca3af;
+  margin-top: 4px;
+}
+

@@ -1,0 +1,26 @@
+.card-footer {
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.85rem;
+}
+
+.footer-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.footer-label {
+  color: #666;
+  font-weight: 500;
+}
+
+.footer-value {
+  color: #333;
+  font-weight: 400;
+}
+

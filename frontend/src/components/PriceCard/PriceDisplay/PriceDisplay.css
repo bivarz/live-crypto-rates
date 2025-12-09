@@ -1,0 +1,31 @@
+.price-display {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
+.price-label {
+  font-size: 0.875rem;
+  color: #6b7280;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.price-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #059669;
+  font-family: 'Courier New', monospace;
+  transition: color 0.3s ease;
+}
+
+.price-value.price-up {
+  color: #10b981;
+}
+
+.price-value.price-down {
+  color: #ef4444;
+}
+
