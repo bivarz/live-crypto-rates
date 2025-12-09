@@ -12,13 +12,13 @@ function App() {
 
       <main className="app-main">
         <section className="price-cards-section">
-          <PriceCard pair="ETHUSDC" displayName="ETH/USDC" />
-          <PriceCard pair="USDTBTC" displayName="USDT/BTC" />
+          <PriceCard pair="ETHUSDT" displayName="ETH/USDT" />
+          <PriceCard pair="BTCUSDT" displayName="BTC/USDT" />
         </section>
 
         <section className="charts-section">
-          <PriceChart pair="ETHUSDC" displayName="ETH/USDC" />
-          <PriceChart pair="USDTBTC" displayName="USDT/BTC" />
+          <PriceChart pair="ETHUSDT" displayName="ETH/USDT" />
+          <PriceChart pair="BTCUSDT" displayName="BTC/USDT" />
         </section>
       </main>
 

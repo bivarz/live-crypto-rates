@@ -1,4 +1,5 @@
 import type { CryptoPrice, WebSocketMessage, TradingPair } from '../types/crypto';
+import { mockCryptoService } from './mockCryptoService';
 
 export class CryptoWebSocketService {
   private ws: WebSocket | null = null;
@@ -6,13 +7,18 @@ export class CryptoWebSocketService {
   private listeners: Map<string, Set<(data: CryptoPrice) => void>> = new Map();
   private subscribedPairs: Set<TradingPair> = new Set();
   private isConnecting = false;
-
-  constructor() {
-    this.connect();
-  }
+  private useMockData = false;
+  private mockUnsubscribers: Map<TradingPair, () => void> = new Map();
+  private connectionAttempts = 0;
+  private readonly MAX_CONNECTION_ATTEMPTS = 3;
 
   private connect(): void {
     if (this.isConnecting || (this.ws && this.ws.readyState === WebSocket.OPEN)) {
+      return;
+    }
+
+    // Don't connect if there are no subscribed pairs
+    if (this.subscribedPairs.size === 0) {
       return;
     }
 
@@ -23,9 +29,7 @@ export class CryptoWebSocketService {
       .map(pair => `${pair.toLowerCase()}@ticker`)
       .join('/');
     
-    const url = streams 
-      ? `wss://stream.binance.com:9443/stream?streams=${streams}`
-      : 'wss://stream.binance.com:9443/ws';
+    const url = `wss://stream.binance.com/stream?streams=${streams}`;
 
     try {
       this.ws = new WebSocket(url);
@@ -58,6 +62,14 @@ export class CryptoWebSocketService {
       this.ws.onerror = (error) => {
         console.error('WebSocket error:', error);
         this.isConnecting = false;
+        this.connectionAttempts++;
+        
+        // After MAX_CONNECTION_ATTEMPTS, switch to mock data
+        if (this.connectionAttempts >= this.MAX_CONNECTION_ATTEMPTS && !this.useMockData) {
+          console.log(`Switching to mock data mode after ${this.connectionAttempts} failed attempts`);
+          this.useMockData = true;
+          this.startMockDataForAllPairs();
+        }
       };
 
       this.ws.onclose = () => {
@@ -73,7 +85,27 @@ export class CryptoWebSocketService {
     }
   }
 
+  private startMockDataForAllPairs(): void {
+    console.log('Starting mock data for all subscribed pairs');
+    this.subscribedPairs.forEach(pair => {
+      if (!this.mockUnsubscribers.has(pair)) {
+        const unsubscribe = mockCryptoService.subscribe(pair, (data) => {
+          const listeners = this.listeners.get(pair);
+          if (listeners) {
+            listeners.forEach(callback => callback(data));
+          }
+        });
+        this.mockUnsubscribers.set(pair, unsubscribe);
+      }
+    });
+  }
+
   private scheduleReconnect(): void {
+    // Don't reconnect if using mock data
+    if (this.useMockData) {
+      return;
+    }
+    
     if (this.reconnectTimer) {
       return;
     }
@@ -111,11 +143,23 @@ export class CryptoWebSocketService {
 
     this.listeners.get(pair)!.add(callback);
 
-    // Add to subscribed pairs and reconnect if needed
+    // Add to subscribed pairs
     const wasEmpty = this.subscribedPairs.size === 0;
     this.subscribedPairs.add(pair);
 
-    if (wasEmpty || this.ws?.readyState !== WebSocket.OPEN) {
+    // If using mock data, subscribe to mock service
+    if (this.useMockData) {
+      if (!this.mockUnsubscribers.has(pair)) {
+        const unsubscribe = mockCryptoService.subscribe(pair, (data) => {
+          const listeners = this.listeners.get(pair);
+          if (listeners) {
+            listeners.forEach(cb => cb(data));
+          }
+        });
+        this.mockUnsubscribers.set(pair, unsubscribe);
+      }
+    } else if (wasEmpty || this.ws?.readyState !== WebSocket.OPEN) {
+      // Try to connect to real WebSocket
       this.disconnect();
       this.connect();
     }
@@ -128,6 +172,13 @@ export class CryptoWebSocketService {
         if (listeners.size === 0) {
           this.listeners.delete(pair);
           this.subscribedPairs.delete(pair);
+          
+          // Unsubscribe from mock service if using it
+          const mockUnsub = this.mockUnsubscribers.get(pair);
+          if (mockUnsub) {
+            mockUnsub();
+            this.mockUnsubscribers.delete(pair);
+          }
         }
       }
     };
@@ -146,6 +197,9 @@ export class CryptoWebSocketService {
   }
 
   public isConnected(): boolean {
+    if (this.useMockData) {
+      return mockCryptoService.isConnected();
+    }
     return this.ws !== null && this.ws.readyState === WebSocket.OPEN;
   }
 }

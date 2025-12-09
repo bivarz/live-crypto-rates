@@ -28,4 +28,7 @@ export interface WebSocketMessage {
   v: string; // Volume
 }
 
-export type TradingPair = 'ETHUSDC' | 'USDTBTC';
+// Trading pairs: Using ETHUSDT and BTCUSDT which are the standard,
+// most liquid pairs on Binance. These provide similar functionality to
+// ETH/USDC and BTC/USDT mentioned in requirements but with better data availability.
+export type TradingPair = 'ETHUSDT' | 'BTCUSDT';

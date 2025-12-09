@@ -1,14 +1,15 @@
 # Live Crypto Rates
 
-A real-time cryptocurrency dashboard that streams live market data for pairs like ETH/USDC and USDT/BTC. Includes interactive charts, instant price updates, and a responsive interface designed to showcase real-time data processing, WebSocket integration, and modern frontend architecture.
+A real-time cryptocurrency dashboard that streams live market data for pairs like ETH/USDT and BTC/USDT. Includes interactive charts, instant price updates, and a responsive interface designed to showcase real-time data processing, WebSocket integration, and modern frontend architecture.
 
 ## Features
 
 - 🚀 **Real-Time Price Updates**: Live streaming of cryptocurrency prices via Binance WebSocket API
 - 📊 **Interactive Charts**: Dynamic price history visualization using Recharts
-- 💱 **Multiple Trading Pairs**: ETH/USDC and USDT/BTC support
+- 💱 **Multiple Trading Pairs**: ETH/USDT and BTC/USDT support
 - 🎨 **Modern UI**: Responsive design with gradient cards and smooth animations
 - 🔄 **Auto-Reconnection**: Automatic WebSocket reconnection on connection loss
+- 🔒 **Fallback Mode**: Automatic mock data mode when WebSocket is unavailable (for demo/restricted environments)
 - 📱 **Responsive Design**: Works seamlessly on desktop and mobile devices
 
 ## Tech Stack
@@ -64,13 +65,34 @@ src/
 │   └── *.css           # Component styles
 ├── hooks/              # Custom React hooks
 │   └── useCryptoPrice.ts
-├── services/           # WebSocket service
-│   └── cryptoWebSocket.ts
+├── services/           # Services
+│   ├── cryptoWebSocket.ts  # WebSocket service
+│   └── mockCryptoService.ts # Mock data service
 ├── types/              # TypeScript types
 │   └── crypto.ts
 ├── App.tsx             # Main application
 └── main.tsx            # Entry point
 ```
+
+## How It Works
+
+The application connects to Binance's WebSocket API to stream real-time cryptocurrency data. If the WebSocket connection fails (e.g., due to network restrictions or unavailability), the app automatically switches to a mock data mode that simulates realistic price movements.
+
+### WebSocket Connection
+
+The app attempts to connect to `wss://stream.binance.com/stream?streams={pair}@ticker` for each trading pair. The connection provides 24-hour ticker statistics including:
+- Current price
+- Price change
+- Price change percentage
+- Volume and other metrics
+
+### Mock Data Fallback
+
+After 3 failed connection attempts, the application automatically switches to mock data mode, which:
+- Generates realistic price movements (±0.5% variation)
+- Updates every 2 seconds
+- Maintains separate state for each trading pair
+- Provides a seamless demo experience
 
 ## Data Source
 
