@@ -46,7 +46,6 @@ describe('PriceAggregationService', () => {
       const symbol = 'BINANCE:ETHUSDC';
       const maxSize = 10000;
 
-      // Add more than maxSize prices
       for (let i = 0; i < maxSize + 100; i++) {
         const price = Price.create(symbol, 2500 + i, Date.now() + i);
         const event = new PriceReceivedEvent(price);
@@ -142,7 +141,6 @@ describe('PriceAggregationService', () => {
       const symbol = 'BINANCE:ETHUSDC';
       const now = Date.now();
 
-      // Add prices within the same hour
       for (let i = 0; i < 10; i++) {
         const price = Price.create(symbol, 2500 + i, now - (10 - i) * 60000);
         service.handlePriceReceived(new PriceReceivedEvent(price));
@@ -208,7 +206,9 @@ describe('PriceAggregationService', () => {
 
       const history = service.getPriceHistory(symbol);
       for (let i = 1; i < history.length; i++) {
-        expect(history[i].timestamp).toBeGreaterThanOrEqual(history[i - 1].timestamp);
+        expect(history[i].timestamp).toBeGreaterThanOrEqual(
+          history[i - 1].timestamp,
+        );
       }
     });
   });
@@ -235,11 +235,9 @@ describe('PriceAggregationService', () => {
       const symbol = 'BINANCE:ETHUSDC';
       const now = Date.now();
 
-      // Add old price (more than 1 hour ago)
       const oldPrice = Price.create(symbol, 2000, now - 2 * 60 * 60 * 1000);
       service.handlePriceReceived(new PriceReceivedEvent(oldPrice));
 
-      // Add recent prices
       const recentPrices = [2500, 2600, 2700];
       recentPrices.forEach((price) => {
         const priceEntity = Price.create(symbol, price, now - 1000);
@@ -256,4 +254,3 @@ describe('PriceAggregationService', () => {
     });
   });
 });
-

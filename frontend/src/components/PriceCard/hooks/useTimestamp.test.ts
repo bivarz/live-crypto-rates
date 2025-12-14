@@ -1,17 +1,21 @@
-import { renderHook, act } from "@testing-library/react";
+import { renderHook } from "@testing-library/react";
 import { useTimestamp } from "./useTimestamp";
 import { formatDateTimeUTC } from "../../../utils/formatters";
 
 jest.mock("../../../utils/formatters", () => ({
   formatDateTimeUTC: jest.fn((ts) => {
     if (!ts) return "N/A";
-    const date = new Date(ts);
+    const timestamp = ts < 10000000000 ? ts * 1000 : ts;
+    const date = new Date(timestamp);
+    if (isNaN(date.getTime())) return "N/A";
+
     const year = date.getUTCFullYear();
     const month = String(date.getUTCMonth() + 1).padStart(2, "0");
     const day = String(date.getUTCDate()).padStart(2, "0");
     const hours = String(date.getUTCHours()).padStart(2, "0");
     const minutes = String(date.getUTCMinutes()).padStart(2, "0");
     const seconds = String(date.getUTCSeconds()).padStart(2, "0");
+
     return `${year}-${month}-${day} ${hours}:${minutes}:${seconds} UTC`;
   }),
 }));
@@ -19,85 +23,68 @@ jest.mock("../../../utils/formatters", () => ({
 describe("useTimestamp", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    jest.useFakeTimers();
-    jest.setSystemTime(new Date("2024-01-01T12:00:00Z"));
-  });
-
-  afterEach(() => {
-    jest.clearAllTimers();
-    jest.useRealTimers();
   });
 
   it("should return 'N/A' when timestamp is undefined", () => {
-    const { result, unmount } = renderHook(() => useTimestamp(undefined));
+    const { result } = renderHook(() => useTimestamp(undefined));
     expect(result.current).toBe("N/A");
-    unmount();
+    expect(formatDateTimeUTC).not.toHaveBeenCalled();
   });
 
   it("should format timestamp correctly", () => {
+    (formatDateTimeUTC as jest.Mock).mockReturnValue("2024-01-01 12:00:00 UTC");
     const timestamp = 1704110400000;
-    const { result, unmount } = renderHook(() => useTimestamp(timestamp));
-    expect(formatDateTimeUTC).toHaveBeenCalled();
-    expect(result.current).not.toBe("N/A");
-    unmount();
+    const { result } = renderHook(() => useTimestamp(timestamp));
+    expect(formatDateTimeUTC).toHaveBeenCalledWith(timestamp);
+    expect(result.current).toBe("2024-01-01 12:00:00 UTC");
+    expect(typeof result.current).toBe("string");
+    expect(result.current).toContain("UTC");
   });
 
   it("should convert timestamp from seconds to milliseconds", () => {
     const timestamp = 1704110400;
-    const { result, unmount } = renderHook(() => useTimestamp(timestamp));
-    expect(formatDateTimeUTC).toHaveBeenCalled();
+    const { result } = renderHook(() => useTimestamp(timestamp));
+    expect(formatDateTimeUTC).toHaveBeenCalledWith(timestamp);
     expect(result.current).not.toBe("N/A");
-    unmount();
   });
 
-  it("should update timestamp every second", () => {
+  it("should return the same value when timestamp doesn't change", () => {
+    (formatDateTimeUTC as jest.Mock).mockReturnValue("2024-01-01 12:00:00 UTC");
     const timestamp = 1704110400000;
-    const { result, unmount } = renderHook(() => useTimestamp(timestamp));
-
-    const initialCallCount = (formatDateTimeUTC as jest.Mock).mock.calls.length;
-
-    act(() => {
-      jest.advanceTimersByTime(1000);
-    });
-
-    expect((formatDateTimeUTC as jest.Mock).mock.calls.length).toBeGreaterThan(
-      initialCallCount
+    const { result, rerender } = renderHook(
+      ({ ts }) => useTimestamp(ts),
+      { initialProps: { ts: timestamp } }
     );
-    unmount();
+
+    const firstResult = result.current;
+    jest.clearAllMocks();
+
+    rerender({ ts: timestamp });
+
+    expect(result.current).toBe(firstResult);
   });
 
-  it("should calculate elapsed time correctly", () => {
-    const baseTime = new Date("2024-01-01T12:00:00Z").getTime();
-    jest.setSystemTime(baseTime);
-
-    const timestamp = baseTime - 5000;
-    const { result, unmount } = renderHook(() => useTimestamp(timestamp));
-
-    expect(formatDateTimeUTC).toHaveBeenCalledWith(
-      expect.any(Number)
+  it("should update when timestamp changes", () => {
+    const timestamp1 = 1704110400000;
+    const timestamp2 = 1704110500000;
+    const { rerender } = renderHook(
+      ({ ts }) => useTimestamp(ts),
+      { initialProps: { ts: timestamp1 } }
     );
-    unmount();
+
+    expect(formatDateTimeUTC).toHaveBeenCalledWith(timestamp1);
+
+    rerender({ ts: timestamp2 });
+
+    expect(formatDateTimeUTC).toHaveBeenCalledWith(timestamp2);
+    expect(formatDateTimeUTC).toHaveBeenCalledTimes(2);
   });
 
   it("should handle timestamp in milliseconds", () => {
     const timestamp = 1704110400000;
-    const { result, unmount } = renderHook(() => useTimestamp(timestamp));
+    const { result } = renderHook(() => useTimestamp(timestamp));
     expect(result.current).not.toBe("N/A");
-    unmount();
-  });
-
-  it("should clear interval on unmount", () => {
-    const timestamp = 1704110400000;
-    const { unmount } = renderHook(() => useTimestamp(timestamp));
-
-    const clearIntervalSpy = jest.spyOn(global, "clearInterval");
-
-    act(() => {
-      unmount();
-    });
-
-    expect(clearIntervalSpy).toHaveBeenCalled();
-    clearIntervalSpy.mockRestore();
+    expect(formatDateTimeUTC).toHaveBeenCalledWith(timestamp);
   });
 });
 

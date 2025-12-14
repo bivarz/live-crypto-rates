@@ -77,6 +77,7 @@ export class CryptoGateway implements OnGatewayConnection, OnGatewayDisconnect {
         price: price.price,
         timestamp: price.timestamp,
       };
+
       const history = this.priceAggregationService.getPriceHistory(symbol);
       priceHistory[symbol] = history.map((p) => ({
         symbol: p.symbol,

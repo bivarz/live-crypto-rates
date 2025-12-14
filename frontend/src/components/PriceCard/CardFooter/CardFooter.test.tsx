@@ -1,8 +1,35 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
 import CardFooter from "./CardFooter";
+import { formatPrice, getCurrencyFromSymbol } from "../../../utils/formatters";
+
+jest.mock("../../../utils/formatters", () => ({
+  formatPrice: jest.fn((value) => {
+    if (value === undefined || value === null) return "N/A";
+    if (value < 0.01) {
+      return value.toFixed(8);
+    }
+    if (value < 1) {
+      return value.toFixed(4);
+    }
+    return value.toLocaleString("en-US", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+  }),
+  getCurrencyFromSymbol: jest.fn((symbol) => {
+    if (symbol?.includes("USDC")) return "USDC";
+    if (symbol?.includes("USDT")) return "USDT";
+    if (symbol?.includes("BTC")) return "BTC";
+    return "";
+  }),
+}));
 
 describe("CardFooter", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   it("should render last update label", () => {
     render(<CardFooter lastUpdate="2024-01-01 12:00:00 UTC" />);
     expect(screen.getByText("Last update:")).toBeInTheDocument();
@@ -49,6 +76,60 @@ describe("CardFooter", () => {
       expect(screen.getByText(timestamp)).toBeInTheDocument();
       unmount();
     });
+  });
+
+  it("should display hourly average when provided", () => {
+    (formatPrice as jest.Mock).mockReturnValue("3,399.80");
+    (getCurrencyFromSymbol as jest.Mock).mockReturnValue("USDC");
+    render(
+      <CardFooter
+        lastUpdate="2024-01-01 12:00:00 UTC"
+        hourlyAverage={3399.8}
+        symbol="ETH/USDC"
+      />
+    );
+    expect(getCurrencyFromSymbol).toHaveBeenCalledWith("ETH/USDC");
+    expect(screen.getByText("1h AVG 3,399.80 USDC")).toBeInTheDocument();
+  });
+
+  it("should not display hourly average when not provided", () => {
+    render(<CardFooter lastUpdate="2024-01-01 12:00:00 UTC" />);
+    expect(screen.queryByText(/1h AVG/)).not.toBeInTheDocument();
+  });
+
+  it("should not display hourly average when symbol is missing", () => {
+    render(
+      <CardFooter
+        lastUpdate="2024-01-01 12:00:00 UTC"
+        hourlyAverage={3399.8}
+      />
+    );
+    expect(screen.queryByText(/1h AVG/)).not.toBeInTheDocument();
+  });
+
+  it("should not display hourly average when average is undefined", () => {
+    render(
+      <CardFooter
+        lastUpdate="2024-01-01 12:00:00 UTC"
+        symbol="ETH/USDC"
+      />
+    );
+    expect(screen.queryByText(/1h AVG/)).not.toBeInTheDocument();
+  });
+
+  it("should format hourly average correctly", () => {
+    (formatPrice as jest.Mock).mockReturnValue("3,399.80");
+    (getCurrencyFromSymbol as jest.Mock).mockReturnValue("USDC");
+    render(
+      <CardFooter
+        lastUpdate="2024-01-01 12:00:00 UTC"
+        hourlyAverage={3399.8}
+        symbol="ETH/USDC"
+      />
+    );
+    expect(formatPrice).toHaveBeenCalledWith(3399.8);
+    expect(getCurrencyFromSymbol).toHaveBeenCalledWith("ETH/USDC");
+    expect(screen.getByText("1h AVG 3,399.80 USDC")).toBeInTheDocument();
   });
 });
 

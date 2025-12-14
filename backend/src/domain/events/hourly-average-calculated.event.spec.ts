@@ -33,9 +33,24 @@ describe('HourlyAverageCalculatedEvent', () => {
 
   it('should handle different hourly average values', () => {
     const averages = [
-      HourlyAverage.create('BINANCE:ETHUSDC', 2500, '2024-01-01T10:00:00.000Z', 100),
-      HourlyAverage.create('BINANCE:ETHUSDT', 3000, '2024-01-01T11:00:00.000Z', 50),
-      HourlyAverage.create('BINANCE:ETHBTC', 0.05, '2024-01-01T12:00:00.000Z', 200),
+      HourlyAverage.create(
+        'BINANCE:ETHUSDC',
+        2500,
+        '2024-01-01T10:00:00.000Z',
+        100,
+      ),
+      HourlyAverage.create(
+        'BINANCE:ETHUSDT',
+        3000,
+        '2024-01-01T11:00:00.000Z',
+        50,
+      ),
+      HourlyAverage.create(
+        'BINANCE:ETHBTC',
+        0.05,
+        '2024-01-01T12:00:00.000Z',
+        200,
+      ),
     ];
 
     averages.forEach((avg) => {
@@ -44,4 +59,3 @@ describe('HourlyAverageCalculatedEvent', () => {
     });
   });
 });
-

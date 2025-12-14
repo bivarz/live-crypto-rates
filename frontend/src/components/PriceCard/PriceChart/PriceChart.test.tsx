@@ -13,18 +13,26 @@ jest.mock("../../../utils/formatters", () => ({
   }),
 }));
 
-jest.mock("recharts", () => ({
-  ResponsiveContainer: ({ children }: { children: React.ReactNode }) => (
-    <div data-testid="responsive-container">{children}</div>
-  ),
-  LineChart: ({ children }: { children: React.ReactNode }) => (
-    <div data-testid="line-chart">{children}</div>
-  ),
-  Line: () => <div data-testid="line" />,
-  XAxis: () => <div data-testid="x-axis" />,
-  YAxis: () => <div data-testid="y-axis" />,
-  Tooltip: () => <div data-testid="tooltip" />,
-}));
+jest.mock("recharts", () => {
+  const React = require("react");
+  return {
+    ResponsiveContainer: ({ children }: { children: React.ReactNode }) => (
+      <div data-testid="responsive-container">{children}</div>
+    ),
+    LineChart: ({ children }: { children: React.ReactNode }) => (
+      <div data-testid="line-chart">{children}</div>
+    ),
+    Line: ({ stroke }: { stroke?: string }) => <div data-testid="line" data-stroke={stroke} />,
+    XAxis: () => <div data-testid="x-axis" />,
+    YAxis: () => <div data-testid="y-axis" />,
+    Tooltip: ({ content, active, payload }: any) => {
+      if (content && active && payload) {
+        return React.cloneElement(content, { active, payload });
+      }
+      return <div data-testid="tooltip" />;
+    },
+  };
+});
 
 describe("PriceChart", () => {
   beforeEach(() => {
@@ -154,6 +162,46 @@ describe("PriceChart", () => {
       { price: 3400, timestamp: now - 2000000 },
       { price: 3400, timestamp: now - 1000000 },
     ];
+
+    render(<PriceChart data={data} />);
+
+    expect(screen.getByTestId("line-chart")).toBeInTheDocument();
+  });
+
+  it("should use green color for upward trend", () => {
+    const now = Date.now();
+    const data = [
+      { price: 3400, timestamp: now - 3000000 },
+      { price: 3600, timestamp: now - 1000000 },
+    ];
+
+    render(<PriceChart data={data} />);
+
+    const line = screen.getByTestId("line");
+    expect(line).toHaveAttribute("data-stroke", "#10b981");
+  });
+
+  it("should use red color for downward trend", () => {
+    const now = Date.now();
+    const data = [
+      { price: 3600, timestamp: now - 3000000 },
+      { price: 3400, timestamp: now - 1000000 },
+    ];
+
+    render(<PriceChart data={data} />);
+
+    const line = screen.getByTestId("line");
+    expect(line).toHaveAttribute("data-stroke", "#ef4444");
+  });
+
+  it("should render CustomTooltip when active", () => {
+    const now = Date.now();
+    const data = [
+      { price: 3400, timestamp: now - 3000000 },
+      { price: 3500, timestamp: now - 1000000 },
+    ];
+
+    (formatPrice as jest.Mock).mockReturnValue("3,400.00");
 
     render(<PriceChart data={data} />);
 

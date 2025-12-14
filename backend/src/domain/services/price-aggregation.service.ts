@@ -112,7 +112,6 @@ export class PriceAggregationService {
 
     this.hourlyAverages.set(symbol, averages);
 
-    // Emit domain event
     this.eventEmitter.emit(
       'hourly-average.calculated',
       new HourlyAverageCalculatedEvent(hourlyAvg),

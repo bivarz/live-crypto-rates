@@ -34,25 +34,31 @@ const Dashboard: React.FC = () => {
       )}
 
       <div className="price-grid">
-        {isLoading
-          ? CRYPTO_SYMBOLS.map((symbol) => <PriceCardSkeleton key={symbol} />)
-          : CRYPTO_SYMBOLS.map((symbol) => {
-              const price = prices[symbol];
-              const average = hourlyAverages[symbol];
-              const displayName = SYMBOL_MAP[symbol];
+        {CRYPTO_SYMBOLS.map((symbol) => {
+          const price = prices[symbol];
+          const average = hourlyAverages[symbol];
+          const displayName = SYMBOL_MAP[symbol];
+          const hasPriceData =
+            price?.price !== undefined &&
+            price?.price !== null &&
+            !isNaN(price.price);
 
-              return (
-                <PriceCard
-                  key={symbol}
-                  symbol={displayName}
-                  price={price?.price}
-                  timestamp={price?.timestamp}
-                  hourlyAverage={average?.average}
-                  hourlyCount={average?.count}
-                  priceHistory={priceHistory[symbol]}
-                />
-              );
-            })}
+          if (isLoading || !hasPriceData) {
+            return <PriceCardSkeleton key={symbol} />;
+          }
+
+          return (
+            <PriceCard
+              key={symbol}
+              symbol={displayName}
+              price={price?.price}
+              timestamp={price?.timestamp}
+              hourlyAverage={average?.average}
+              hourlyCount={average?.count}
+              priceHistory={priceHistory[symbol]}
+            />
+          );
+        })}
       </div>
     </div>
   );

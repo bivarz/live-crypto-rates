@@ -152,10 +152,10 @@ describe("Dashboard", () => {
 
     const ethUsdcCard = screen.getByTestId("price-card-ETH/USDC");
     expect(ethUsdcCard).toBeInTheDocument();
-    
+
     const symbols = screen.getAllByTestId("card-symbol");
     expect(symbols[0]).toHaveTextContent("ETH/USDC");
-    
+
     const prices = screen.getAllByTestId("card-price");
     expect(prices[0]).toHaveTextContent("3400.5");
   });
@@ -177,8 +177,8 @@ describe("Dashboard", () => {
     render(<Dashboard />);
 
     expect(screen.getByTestId("price-card-ETH/USDC")).toBeInTheDocument();
-    expect(screen.getByTestId("price-card-ETH/USDT")).toBeInTheDocument();
-    expect(screen.getByTestId("price-card-ETH/BTC")).toBeInTheDocument();
+    const skeletons = document.querySelectorAll(".price-card-skeleton");
+    expect(skeletons.length).toBeGreaterThan(0);
   });
 
   it("should handle empty data state", () => {
@@ -191,10 +191,10 @@ describe("Dashboard", () => {
 
     render(<Dashboard />);
 
-    CRYPTO_SYMBOLS.forEach((symbol) => {
-      const displayName = SYMBOL_MAP[symbol];
-      expect(screen.getByTestId(`price-card-${displayName}`)).toBeInTheDocument();
-    });
+    const skeletons = document.querySelectorAll(".price-card-skeleton");
+    expect(skeletons.length).toBe(CRYPTO_SYMBOLS.length);
+
+    expect(screen.getByText("Connecting to price feed...")).toBeInTheDocument();
   });
 
   it("should render correct number of price cards", () => {

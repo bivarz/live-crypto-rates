@@ -24,3 +24,10 @@
   font-weight: 400;
 }
 
+.footer-avg {
+  width: 100%;
+  text-align: right;
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+

@@ -1,5 +1,8 @@
 export const formatPrice = (value?: number): string => {
   if (value === undefined || value === null) return "N/A";
+  if (value === 0) {
+    return "0.00";
+  }
   if (value < 0.01) {
     return value.toFixed(8);
   }
@@ -23,6 +26,19 @@ export const formatTime = (ts?: number): string => {
     second: "2-digit",
     hour12: true,
   });
+};
+
+export const formatTimeOnly = (ts?: number): string => {
+  if (!ts) return "N/A";
+  const timestamp = ts < 10000000000 ? ts * 1000 : ts;
+  const date = new Date(timestamp);
+  if (isNaN(date.getTime())) return "N/A";
+
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  const seconds = String(date.getSeconds()).padStart(2, "0");
+
+  return `${hours}:${minutes}:${seconds}`;
 };
 
 export const getCurrentTime = (): string => {

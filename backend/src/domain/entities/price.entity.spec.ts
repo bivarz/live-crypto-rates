@@ -37,7 +37,11 @@ describe('Price Entity', () => {
 
     it('should handle very large price values', () => {
       const largePrice = Number.MAX_SAFE_INTEGER;
-      const priceEntity = Price.create('BINANCE:ETHUSDC', largePrice, Date.now());
+      const priceEntity = Price.create(
+        'BINANCE:ETHUSDC',
+        largePrice,
+        Date.now(),
+      );
 
       expect(priceEntity.price).toBe(largePrice);
     });
@@ -57,4 +61,3 @@ describe('Price Entity', () => {
     });
   });
 });
-

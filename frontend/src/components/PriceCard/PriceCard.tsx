@@ -35,7 +35,11 @@ const PriceCard: React.FC<PriceCardProps> = ({
         )}
       </div>
 
-      <CardFooter lastUpdate={lastUpdate} />
+      <CardFooter 
+        lastUpdate={lastUpdate} 
+        hourlyAverage={hourlyAverage}
+        symbol={symbol}
+      />
     </div>
   );
 };

@@ -38,8 +38,12 @@ describe('PriceReceivedHandler', () => {
 
       handler.handle(event);
 
-      expect(priceAggregationService.handlePriceReceived).toHaveBeenCalledTimes(1);
-      expect(priceAggregationService.handlePriceReceived).toHaveBeenCalledWith(event);
+      expect(priceAggregationService.handlePriceReceived).toHaveBeenCalledTimes(
+        1,
+      );
+      expect(priceAggregationService.handlePriceReceived).toHaveBeenCalledWith(
+        event,
+      );
     });
 
     it('should handle multiple events correctly', () => {
@@ -54,7 +58,9 @@ describe('PriceReceivedHandler', () => {
         handler.handle(event);
       });
 
-      expect(priceAggregationService.handlePriceReceived).toHaveBeenCalledTimes(3);
+      expect(priceAggregationService.handlePriceReceived).toHaveBeenCalledTimes(
+        3,
+      );
     });
 
     it('should pass the correct event to the service', () => {
@@ -63,8 +69,9 @@ describe('PriceReceivedHandler', () => {
 
       handler.handle(event);
 
-      expect(priceAggregationService.handlePriceReceived).toHaveBeenCalledWith(event);
+      expect(priceAggregationService.handlePriceReceived).toHaveBeenCalledWith(
+        event,
+      );
     });
   });
 });
-

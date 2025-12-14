@@ -170,9 +170,7 @@ describe('CryptoGateway', () => {
         ),
       );
 
-      const priceHistory = [
-        Price.create('BINANCE:ETHUSDC', 2500, Date.now()),
-      ];
+      const priceHistory = [Price.create('BINANCE:ETHUSDC', 2500, Date.now())];
 
       jest
         .spyOn(priceAggregationService, 'getAllLatestPrices')
@@ -251,4 +249,3 @@ describe('CryptoGateway', () => {
     });
   });
 });
-

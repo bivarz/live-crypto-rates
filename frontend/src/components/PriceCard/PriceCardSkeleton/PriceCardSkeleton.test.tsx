@@ -116,7 +116,6 @@ describe("PriceCardSkeleton", () => {
     const { container } = render(<PriceCardSkeleton />);
     const allLines = container.querySelectorAll(".skeleton-line");
 
-    // Should have: 1 large, 1 medium, 3 small (2 in price row + 1 in footer)
     expect(allLines.length).toBe(5);
   });
 
@@ -150,7 +149,6 @@ describe("PriceCardSkeleton", () => {
   it("should match the structure of PriceCard component", () => {
     const { container } = render(<PriceCardSkeleton />);
 
-    // Should have header, body, and footer like PriceCard
     expect(container.querySelector(".skeleton-header")).toBeInTheDocument();
     expect(container.querySelector(".skeleton-body")).toBeInTheDocument();
     expect(container.querySelector(".skeleton-footer")).toBeInTheDocument();

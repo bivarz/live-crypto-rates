@@ -30,7 +30,9 @@ A fullstack application for monitoring real-time cryptocurrency exchange rates w
 - Node.js 20+ and npm
 - **Finnhub API Key** (required - get one at https://finnhub.io/)
 - Docker and Docker Compose (optional, for containerized deployment)
-  - Install Docker Desktop from https://www.docker.com/products/docker-desktop
+  - **Windows**: Install Docker Desktop from https://www.docker.com/products/docker-desktop
+  - **macOS**: Install Docker Desktop or use alternatives like Colima/OrbStack
+  - **Linux**: Install Docker Engine directly (no Desktop needed)
   - After installation, use `docker compose` (without hyphen) for newer versions
   - Older versions may use `docker-compose` (with hyphen)
 
@@ -241,6 +243,71 @@ docker compose down
 ```
 
 **Note:** If `docker compose` doesn't work, try `docker-compose` (with hyphen).
+
+### Cloud Deployment
+
+This application is fully compatible with cloud container services. The Dockerfiles are cross-platform compatible (Linux, macOS, Windows) and work seamlessly in cloud environments.
+
+#### AWS (Amazon Web Services)
+
+**Option 1: AWS ECS with Fargate**
+- Push images to Amazon ECR (Elastic Container Registry)
+- Create ECS task definitions
+- Deploy using Fargate (serverless containers)
+
+**Option 2: AWS EC2 with Docker**
+- Launch EC2 instance (Amazon Linux 2 or Ubuntu)
+- Install Docker Engine
+- Clone repository and run `docker compose up -d`
+
+**Option 3: AWS App Runner**
+- Connect to GitHub/ECR
+- Configure build and run commands
+- Automatic scaling and HTTPS
+
+#### Azure (Microsoft Azure)
+
+**Option 1: Azure Container Instances (ACI)**
+- Build and push images to Azure Container Registry (ACR)
+- Create container groups with docker-compose
+- Simple serverless deployment
+
+**Option 2: Azure Container Apps**
+- Deploy containerized applications
+- Built-in auto-scaling and load balancing
+- Integrated with Azure Container Registry
+
+**Option 3: Azure App Service for Containers**
+- Deploy Docker containers directly
+- Continuous deployment from ACR
+- Built-in CI/CD integration
+
+#### Other Cloud Providers
+
+- **Google Cloud Platform**: Cloud Run, GKE (Google Kubernetes Engine)
+- **DigitalOcean**: App Platform or Droplets with Docker
+- **Heroku**: Container Registry and Runtime
+- **Vercel/Railway**: For simplified deployments
+
+#### Environment Variables for Cloud Deployment
+
+Make sure to set these environment variables in your cloud platform:
+
+```bash
+# Backend
+PORT=3001
+FRONTEND_URL=https://your-frontend-domain.com
+FINNHUB_API_KEY=your_finnhub_api_key_here
+
+# Frontend (build time)
+REACT_APP_BACKEND_URL=https://your-backend-domain.com
+```
+
+**Important Notes:**
+- Replace URLs with your actual production domains
+- Use HTTPS in production
+- Store API keys securely (use cloud provider's secret management)
+- Consider using environment-specific docker-compose files
 
 ## License
 
