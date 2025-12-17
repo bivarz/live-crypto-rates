@@ -25,6 +25,8 @@ backend/src/
 │       └── crypto.gateway.ts
 └── app.module.ts             # Main NestJS module
 ```
+<img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/c33ab5af-a628-4ea9-84f2-c85a311fa0f4" />
+
 
 ## Data Flow
 
