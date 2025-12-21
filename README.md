@@ -18,6 +18,8 @@ A fullstack application for monitoring real-time cryptocurrency exchange rates w
 - **NestJS**: Progressive Node.js framework
 - **Socket.IO**: WebSocket implementation for real-time communication
 - **Finnhub API**: WebSocket integration for live cryptocurrency data
+- **TypeORM**: ORM for database operations
+- **SQLite**: Lightweight database for persistence
 
 ### Frontend
 
